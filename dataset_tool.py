@@ -66,13 +66,18 @@ def open_image_folder(source_dir, *, max_images: Optional[int]):
     max_idx = maybe_min(len(input_images), max_images)
 
     def iterate_images():
-        for idx, fname in enumerate(input_images):
+        idx = 0
+        for fname in input_images:
             arch_fname = os.path.relpath(fname, source_dir)
             arch_fname = arch_fname.replace('\\', '/')
-            img = np.array(PIL.Image.open(fname))
-            yield dict(img=img, label=labels.get(arch_fname))
-            if idx >= max_idx-1:
-                break
+            try:
+                img = np.array(PIL.Image.open(fname))
+                yield dict(img=img, label=labels.get(arch_fname))
+                if idx >= max_idx-1:
+                    break
+                idx+=1
+            except:
+                continue
     return max_idx, iterate_images()
 
 #----------------------------------------------------------------------------
